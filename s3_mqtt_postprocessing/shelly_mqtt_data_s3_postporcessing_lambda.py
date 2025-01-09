@@ -16,6 +16,7 @@ def lambda_handler(event, context):
     date_prefix = process_date.strftime('%Y/%m/%d')
     bucket_name = 'mozharovskyi-shelly-gcp-raw-mqtt-storage-eu-central-1'
     main_directories = ['MozharovskysEM']
+    transfer_files = list()
 
     # Process each directory
     for main_dir in main_directories:
@@ -85,9 +86,16 @@ def lambda_handler(event, context):
                 break
     # Return the result
     logger.info(f"Are there more files to process? {has_more_files}")
+    if not has_more_files:
+        for main_dir in main_directories:
+            prefix = f'{main_dir}/{date_prefix}/'
+            combined_filename = f'{process_date.strftime("%Y-%m-%d")}.json'
+            combined_filepath = f'{prefix}{combined_filename}'
+            transfer_files.append(combined_filepath)
     logger.info("End of the function")
+    message = "All data processed for all directories" if not has_more_files else "There are more data to process"
     return {
-        'statusCode': 200,
         'hasMoreFiles': has_more_files,
-        'body': json.dumps('Data processed successfully for all directories')
+        'filenames': transfer_files,
+        'body': json.dumps(message)
     }
