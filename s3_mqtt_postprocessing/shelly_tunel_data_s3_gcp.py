@@ -11,6 +11,7 @@ s3_client = boto3.client('s3')
 
 def lambda_handler(event, context):
     # Configuration data
+    logger.info("Start of the function")
     project_id = 'shelly-gcp-data-analytics'
     job_name = 'transferJobs/shelly-get-data-from-aws'  # This can be None if the job has not been created yet
     gcp_access_token = ''  # Retrieve the token from Secrets Manager or environment variable
@@ -82,6 +83,7 @@ def lambda_handler(event, context):
         else:
             response = requests.post(base_url, headers=headers, data=json.dumps(transfer_job_data))
         response.raise_for_status()  # Raises an HTTPError for bad responses
+        logger.info("End of the function")
         return {
             'statusCode': response.status_code,
             'body': response.json()
