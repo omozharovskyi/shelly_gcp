@@ -97,5 +97,6 @@ def lambda_handler(event, context):
     return {
         'hasMoreFiles': has_more_files,
         'filenames': transfer_files,
+        's3bucket': bucket_name,
         'body': json.dumps(message)
     }
