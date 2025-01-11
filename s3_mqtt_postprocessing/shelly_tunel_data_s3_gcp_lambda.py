@@ -1,15 +1,15 @@
 import json
 import logging
-import datetime
 import boto3
-import requests
+from google.cloud import storage
+from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials
 
 # Configure logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-s3_client = boto3.client('s3')
 
-def get_gcp_access_token():
+def get_gcp_access_secret():
     secret_name = "GCPTransferJobAccessTokenSecret"
     region_name = "eu-central-1"
     session = boto3.session.Session()
@@ -22,94 +22,41 @@ def get_gcp_access_token():
     else:
         if 'SecretString' in get_secret_value_response:
             secret = get_secret_value_response['SecretString']
-            return json.loads(secret)['GCPTransferJobAccessToken']
+            logger.info(f"Retrieved GCP Access secret: {secret}")
+            return json.loads(secret)
         else:
             logger.error("Secret does not contain 'SecretString'")
             return None
 
 def lambda_handler(event, context):
-    # Configuration data
     logger.info("Start of the function")
-    project_id = 'shelly-gcp-data-analytics'
-    job_name = 'transferJobs/shelly-get-data-from-aws'  # This can be None if the job has not been created yet
-    gcp_access_token = get_gcp_access_token()  # Retrieve the token from Secrets Manager
-    if gcp_access_token is None:
-        logger.error("Failed to retrieve GCP access token")
-        return {
-            'statusCode': 500,
-            'body': json.dumps('Error retrieving GCP access token')
-        }
-    gcp_bucket_name = 'mozharovskyi-shelly-gcp-agregated-mqtt-storage-eu'
-    delete_after_transfer = False
-    # Retrieve the list of filenames from the event
-    filenames = event.get('filenames', [])
+    gcp_credentials = service_account.Credentials.from_service_account_info(get_gcp_access_secret())
+    logger.info(f'Retrived credentials: {gcp_credentials}')
     aws_s3bucket_name = event.get('s3bucket')
-    # Check if files exist in the S3 bucket and filter out non-existing files
-    existing_filenames = []
+    filenames = event.get('filenames', [])
+    gcp_bucket_name = 'mozharovskyi-shelly-gcp-agregated-mqtt-storage-eu'
+    s3_client = boto3.client('s3')
+    gcp_storage_client = storage.Client(credentials=gcp_credentials)
+    logger.info("GCP Storage Client created successfully")
+    bucket = gcp_storage_client.bucket(gcp_bucket_name)
     for filename in filenames:
+        # Read file from S3
         try:
-            response = s3_client.head_object(Bucket=aws_s3bucket_name, Key=filename)
-            existing_filenames.append(filename)
-        except s3_client.exceptions.ClientError as defined_error:
-            if defined_error.response['Error']['Code'] == '404':
-                logger.info(f"File {filename} does not exist.")
-            else:
-                logger.info(f'Unexpected error: {defined_error}')
-    logger.info(f"Files to transfer: {existing_filenames}")
-    headers = {
-        'Authorization': f'Bearer {gcp_access_token}',
-        'Content-Type': 'application/json'
+            file_obj = s3_client.get_object(Bucket=aws_s3bucket_name, Key=filename)
+            file_content = file_obj['Body'].read()
+        except Exception as s3bucket_exception:
+            logger.error(f"Failed to read file from S3: {s3bucket_exception}")
+            continue  # Skip this file and continue with the next
+        # Upload file to GCP
+        blob = bucket.blob(filename)
+        try:
+            blob.upload_from_string(file_content)
+        except Exception as gcpbucket_exception:
+            logger.error(f"Failed to upload file to GCP: {gcpbucket_exception}")
+            continue  # Skip this file and continue with the next
+        logger.info(f"File {filename} successfully transferred to GCP")
+    logger.info("End of the function")
+    return {
+        'statusCode': 200,
+        'body': json.dumps("Files processing completed")
     }
-    # URL for Google Cloud Storage Transfer API
-    base_url = f'https://storagetransfer.googleapis.com/v1/{job_name if job_name else "transferJobs"}'
-    # Data for creating or updating the transfer job
-    transfer_job_data = {
-        'projectId': project_id,
-        'transferSpec': {
-            'gcsDataSource': {
-                'bucketName': aws_s3bucket_name
-            },
-            'gcsDataSink': {
-                'bucketName': gcp_bucket_name
-            },
-            'objectConditions': {
-                'includePrefixes': filenames  # Use the list of filenames from the event
-            },
-            'transferOptions': {
-                'deleteObjectsFromSourceAfterTransfer': delete_after_transfer
-            }
-        },
-        'schedule': {
-            'scheduleStartDate': {
-                'year': datetime.datetime.now().year,
-                'month': datetime.datetime.now().month,
-                'day': datetime.datetime.now().day
-            },
-            'startTimeOfDay': {
-                'hours': 12,
-                'minutes': 0,
-                'seconds': 0
-            }
-        },
-        'status': 'ENABLED'
-    }
-    logger.info(f'GCP API request url: {base_url}')
-    logger.info(f'Transfer job: {json.dumps(transfer_job_data)}')
-    # Execute the HTTP request to create or update the job
-    try:
-        if job_name:
-            response = requests.patch(base_url, headers=headers, data=json.dumps(transfer_job_data))
-        else:
-            response = requests.post(base_url, headers=headers, data=json.dumps(transfer_job_data))
-        response.raise_for_status()  # Raises an HTTPError for bad responses
-        logger.info("End of the function")
-        return {
-            'statusCode': response.status_code,
-            'body': response.json()
-        }
-    except requests.exceptions.RequestException as defined_error:
-        logger.error(f"Failed to make API request: {defined_error}")
-        return {
-            'statusCode': 500,
-            'body': {'error': str(defined_error)}
-        }
