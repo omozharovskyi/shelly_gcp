@@ -6,7 +6,8 @@
       "Type": "Task",
       "Resource": "arn:aws:lambda:us-east-1:448325228795:function:shelly_mqtt_data_s3_postporcessing_lambda:1",
       "Next": "IsThereMoreFilesInS3ToProcess",
-      "ResultPath": "$.lambdaOutput"
+      "ResultPath": "$.lambdaOutput",
+      "Comment": "Invokes the Lambda function to preprocess data from S3. Stores the output in $.lambdaOutput."
     },
     "IsThereMoreFilesInS3ToProcess": {
       "Type": "Choice",
@@ -14,15 +15,18 @@
         {
           "Variable": "$.lambdaOutput.hasMoreFiles",
           "BooleanEquals": true,
-          "Next": "InvokeІS3PreprocessingLambda"
+          "Next": "InvokeІS3PreprocessingLambda",
+          "Comment": "If there are more files to process, invoke the preprocessing Lambda again."
         },
         {
           "Variable": "$.lambdaOutput.hasMoreFiles",
           "BooleanEquals": false,
-          "Next": "InvokeTransferToGCPLambda"
+          "Next": "InvokeTransferToGCPLambda",
+          "Comment": "If there are no more files to process, proceed to transfer files to GCP."
         }
       ],
-      "Default": "EndProcessing"
+      "Default": "EndProcessing",
+      "Comment": "Decides the next step based on whether there are more files to process."
     },
     "InvokeTransferToGCPLambda": {
       "Type": "Task",
@@ -31,10 +35,12 @@
         "s3bucket.$": "$.lambdaOutput.s3bucket",
         "filenames.$": "$.lambdaOutput.filenames"
       },
-      "End": true
+      "End": true,
+      "Comment": "Invokes the Lambda function to transfer the processed files from S3 to GCP. Uses parameters passed from the previous Lambda output."
     },
     "EndProcessing": {
-      "Type": "Succeed"
+      "Type": "Succeed",
+      "Comment": "Marks the end of the state machine execution."
     }
   }
 }
