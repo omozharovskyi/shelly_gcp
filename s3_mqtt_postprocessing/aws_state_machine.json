@@ -1,32 +1,37 @@
 {
-  "Comment": "A state machine that processes files in an S3 bucket using a Lambda function and transfers files to GCP.",
-  "StartAt": "InvokeLambda",
+  "Comment": "A state machine that processes files in an S3 bucket using Lambda functions.",
+  "StartAt": "InvokeІS3PreprocessingLambda",
   "States": {
-    "InvokeLambda": {
+    "InvokeІS3PreprocessingLambda": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:448325228795:function:shelly_mqtt_data_s3_postporcessing_lambda",
-      "Next": "IsThereMoreFiles"
+      "Resource": "arn:aws:lambda:us-east-1:448325228795:function:shelly_mqtt_data_s3_postporcessing_lambda:1",
+      "Next": "IsThereMoreFilesInS3ToProcess",
+      "ResultPath": "$.lambdaOutput"
     },
-    "IsThereMoreFiles": {
+    "IsThereMoreFilesInS3ToProcess": {
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.hasMoreFiles",
+          "Variable": "$.lambdaOutput.hasMoreFiles",
           "BooleanEquals": true,
-          "Next": "InvokeLambda"
+          "Next": "InvokeІS3PreprocessingLambda"
         },
         {
-          "Variable": "$.hasMoreFiles",
+          "Variable": "$.lambdaOutput.hasMoreFiles",
           "BooleanEquals": false,
-          "Next": "TransferFilesToGCP"
+          "Next": "InvokeTransferToGCPLambda"
         }
       ],
       "Default": "EndProcessing"
     },
-    "TransferFilesToGCP": {
+    "InvokeTransferToGCPLambda": {
       "Type": "Task",
-      "Resource": "arn:aws:lambda:us-east-1:448325228795:function:TransferFilesToGCP",
-      "Next": "EndProcessing"
+      "Resource": "arn:aws:lambda:eu-central-1:448325228795:function:shelly_tunel_data_s3_gcp_lambda:1",
+      "Parameters": {
+        "s3bucket.$": "$.lambdaOutput.s3bucket",
+        "filenames.$": "$.lambdaOutput.filenames"
+      },
+      "End": true
     },
     "EndProcessing": {
       "Type": "Succeed"
