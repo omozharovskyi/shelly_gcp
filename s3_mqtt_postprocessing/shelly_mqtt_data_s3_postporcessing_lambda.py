@@ -56,7 +56,7 @@ def lambda_handler(event, context):
             except s3_client.exceptions.NoSuchKey:
                 logger.info("No existing file, creating new one")
             # Write aggregated data
-            s3_client.put_object(Bucket=bucket_name, Key=combined_filepath, Body=json.dumps(combined_data))
+            s3_client.put_object(Bucket=bucket_name, Key=combined_filepath, Body=json.dumps(combined_data, indent=4))
             if files_to_delete:
                 delete_response = s3_client.delete_objects(
                     Bucket=bucket_name,
