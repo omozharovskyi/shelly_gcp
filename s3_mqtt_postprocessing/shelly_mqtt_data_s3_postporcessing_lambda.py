@@ -39,24 +39,36 @@ def lambda_handler(event, context):
                     # Read and process the file
                     file_response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
                     file_content = file_response['Body'].read().decode('utf-8')
-                    json_content = json.loads(file_content)
-                    json_content.pop('id', None)
-                    json_content.pop('calibration', None)
-                    json_content['timestamp'] = file_key.split('/')[-1].split('.')[0]
-                    combined_data.append(json_content)
+                    try:
+                        json_content = json.loads(file_content.strip())
+                        json_content.pop('id', None)
+                        json_content.pop('calibration', None)
+                        json_content['timestamp'] = file_key.split('/')[-1].split('.')[0]
+                        combined_data.append(json_content)
+                    except json.JSONDecodeError as source_decode_error:
+                        logger.error(f"Error decoding JSON from file {file_key}: {source_decode_error}")
                     files_to_delete.append({'Key': file_key})
             combined_filename = f'{process_date.strftime("%Y-%m-%d")}.json'
             combined_filepath = f'{prefix}{combined_filename}'
             # Check if the aggregated file already exists
             try:
                 existing_data = s3_client.get_object(Bucket=bucket_name, Key=combined_filepath)
-                existing_content = json.loads(existing_data['Body'].read().decode('utf-8'))
-                combined_data.extend(existing_content)
+                existing_content = existing_data['Body'].read().decode('utf-8')
+                for line in existing_content.strip().split('\n'):
+                    try:
+                        existing_json = json.loads(line)
+                        combined_data.append(existing_json)
+                    except json.JSONDecodeError as decoding_error:
+                        logger.error(
+                            f"Error decoding JSON from line in existing file {combined_filepath}: {decoding_error}"
+                        )
+                        continue
                 logger.info(f"Existing aggregated data found and merged: {combined_filepath}")
             except s3_client.exceptions.NoSuchKey:
                 logger.info("No existing file, creating new one")
             # Write aggregated data
-            s3_client.put_object(Bucket=bucket_name, Key=combined_filepath, Body=json.dumps(combined_data, indent=4))
+            body_content = '\n'.join(json.dumps(item) for item in combined_data)
+            s3_client.put_object(Bucket=bucket_name, Key=combined_filepath, Body=body_content)
             if files_to_delete:
                 delete_response = s3_client.delete_objects(
                     Bucket=bucket_name,
