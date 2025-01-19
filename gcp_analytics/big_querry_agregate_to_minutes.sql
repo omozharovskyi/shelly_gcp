@@ -28,6 +28,3 @@ WHERE
   next_timestamp IS NOT NULL
 GROUP BY
   minute;
-
-CREATE OR REPLACE TABLE `shelly-gcp-data-analytics.bq_shelly_gcp_dataset.final_results` AS
-SELECT * FROM `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._energy_per_minute`;
