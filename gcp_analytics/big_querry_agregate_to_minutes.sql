@@ -21,7 +21,7 @@ FROM
 CREATE OR REPLACE TABLE `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._energy_per_minute` AS
 SELECT
   minute,
-  SUM(0.5 * (next_aprt_power + aprt_power) * TIMESTAMP_DIFF(next_timestamp, timestamp, SECOND) / 3600) / 1000 AS energy_kWh
+  SUM(0.5 * (next_aprt_power + aprt_power) * TIMESTAMP_DIFF(next_timestamp, timestamp, SECOND) / 3600)  AS energy_Wh
 FROM
   `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._lead_values`
 WHERE
