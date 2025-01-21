@@ -1,6 +1,6 @@
 DECLARE date_range STRING DEFAULT 'all_time';  -- 'all_time', 'last_30_days', 'current_month', 'specific_month'
 
-CREATE OR REPLACE TABLE `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._energy_consumption_summary` AS
+CREATE OR REPLACE TABLE `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._hourly_energy_consumption_kyiv` AS
 WITH filtered_data AS (
   SELECT
     minute,
