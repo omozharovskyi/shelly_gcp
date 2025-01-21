@@ -20,5 +20,5 @@ FROM
 SELECT sum(cost_1_zone), sum (cost_2_zone), sum(cost_3_zone)
 FROM `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._tree_zones_tariff_hourly_kyiv_total`;
 
-select hour_of_day_kyiv, cost_1_zone, cost_2_zone, cost_3_zone
+SELECT hour_of_day_kyiv, cost_1_zone, cost_2_zone, cost_3_zone
 FROM `shelly-gcp-data-analytics.bq_shelly_gcp_dataset._tree_zones_tariff_hourly_kyiv_total` order by hour_of_day_kyiv asc;
