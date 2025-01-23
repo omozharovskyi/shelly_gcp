@@ -1,40 +1,40 @@
-# Analysis of Sensor Data (Аналіз Даних від Датчика)
+# Analysis of Sensor Data
 
-## Introduction (Вступ)
-This document describes possible analyses for data received from a sensor, which include measurements of current, voltage, active and reactive power, power factor, and frequency. (Цей документ описує можливі аналізи для даних, отриманих від датчика, які включають показники струму, напруги, активної та реактивної потужності, коефіцієнта потужності та частоти.)
+## Introduction
+This document describes possible analyses for data received from a sensor, which include measurements of current, voltage, active and reactive power, power factor, and frequency.
 
-## List of Analyses (Перелік Аналізів)
+## List of Analyses
 
-### 1. Trend Analysis (Трендовий Аналіз)
-- Analysis of changes in current, voltage, and power over time. (Аналіз змін струму, напруги та потужності з часом.)
-- Detection of peak loads and anomalies. (Виявлення пікових навантажень та аномалій.)
+### 1. Trend Analysis
+- Analysis of changes in current, voltage, and power over time.
+- Detection of peak loads and anomalies.
 
-### 2. Correlation Analysis (Кореляційний Аналіз)
-- Relationship between current, voltage, and power. (Взаємозв'язок між струмом, напругою та потужністю.)
-- Determining the correlation between different electrical parameters. (Визначення кореляції між різними електричними параметрами.)
+### 2. Correlation Analysis
+- Relationship between current, voltage, and power.
+- Determining the correlation between different electrical parameters.
 
-### 3. Power Factor Analysis (Аналіз Коефіцієнта Потужності)
-- Assessment of system efficiency based on the power factor. (Оцінка ефективності системи на основі коефіцієнта потужності.)
-- Detection of periods of inefficient energy use. (Виявлення періодів неефективного використання енергії.)
+### 3. Power Factor Analysis
+- Assessment of system efficiency based on the power factor.
+- Detection of periods of inefficient energy use.
 
-### 4. Frequency Analysis (Аналіз Частоти)
-- Stability of the power grid based on frequency. (Стабільність електромережі на основі частоти.)
-- Detection of deviations from the normal frequency. (Виявлення відхилень від нормальної частоти.)
+### 4. Frequency Analysis
+- Stability of the power grid based on frequency.
+- Detection of deviations from the normal frequency.
 
-### 5. Anomaly Detection (Виявлення Аномалій)
-- Automatic detection of abnormal readings. (Автоматичне виявлення аномальних показників.)
-- Analysis of data for unexpected spikes or drops. (Аналіз даних на предмет несподіваних сплесків або падінь.)
+### 5. Anomaly Detection
+- Automatic detection of abnormal readings.
+- Analysis of data for unexpected spikes or drops.
 
-### 6. Forecasting (Прогнозування)
-- Modeling and forecasting future energy consumption. (Моделювання та прогнозування майбутнього споживання енергії.)
-- Using historical data to build predictive models. (Використання історичних даних для побудови прогнозних моделей.)
+### 6. Forecasting
+- Modeling and forecasting future energy consumption.
+- Using historical data to build predictive models.
 
-### 7. Consumption Optimization (Оптимізація Споживання)
-- Recommendations for optimizing energy consumption. (Рекомендації щодо оптимізації споживання енергії.)
-- Developing strategies to reduce energy costs. (Розробка стратегій для зниження витрат на енергію.)
+### 7. Consumption Optimization
+- Recommendations for optimizing energy consumption.
+- Developing strategies to reduce energy costs.
 
-### 8. Time Series Analysis (Аналіз Часових Рядів)
-- Seasonality and Cyclicity Analysis (Аналіз Сезонності та Циклічності):** Study of seasonal and cyclical fluctuations in energy consumption. This can include analysis of daily, weekly, or annual patterns. (Вивчення сезонних та циклічних коливань у споживанні енергії. Це може включати аналіз денних, тижневих або річних патернів.)
+### 8. Time Series Analysis
+- **Seasonality and Cyclicity Analysis**: Study of seasonal and cyclical fluctuations in energy consumption. This can include analysis of daily, weekly, or annual patterns.
 
-### 9. Weather Impact Analysis (Аналіз Впливу Погоди)
-- Impact of Meteorological Conditions (Вплив Метеорологічних Умов):** Analysis of how weather conditions (temperature, humidity, illumination, etc.) affect energy consumption. This can help in adapting the energy management system to changes in weather. (Аналіз, як погодні умови (температура, вологість, освітленість тощо) впливають на споживання енергії. Це може допомогти в адаптації системи управління енергією до змін у погоді.)
+### 9. Weather Impact Analysis
+- **Impact of Meteorological Conditions**: Analysis of how weather conditions (temperature, humidity, illumination, etc.) affect energy consumption. This can help in adapting the energy management system to changes in weather.

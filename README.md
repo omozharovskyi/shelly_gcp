@@ -1,63 +1,80 @@
-# Project Plans for IoT Solutions
+# Revised Project Plans for IoT Solutions
 
-## Integration of AWS S3 and Google Cloud Platform for Storing and Analyzing IoT Data | Інтеграція AWS S3 та Google Cloud Platform для зберігання та аналізу IoT даних
+## Integration of AWS S3 and Google Cloud Platform for Storing and Analyzing IoT Data
 
-### Project Goals | Цілі проекту
-- Ensure reliable storage of telemetry from IoT devices (Shelly EM) in Amazon S3. | Забезпечити надійне зберігання телеметрії з IoT пристроїв (Shelly EM) в Amazon S3.
-- Utilize Google Cloud Platform tools for effective data analysis and processing. | Використовувати інструменти Google Cloud Platform для ефективного аналізу та обробки зібраних даних.
+### Project Goals
+- Ensure efficient storage of telemetry from IoT devices (Shelly EM) using AWS S3.
+- Utilize Google Cloud Platform tools for scalable and efficient data analysis.
+- Transition towards a fully integrated system that supports both real-time and batch processing.
 
-### Implementation Stages | Етапи реалізації
+### Implementation Stages
 
-#### Stage 0: Sensor Setup and Configuration | Етап 0: Налаштування та конфігурація датчика
-1. Physical Connection of the Sensor | Фізичне підключення датчика
-   - Connecting the IoT sensor (Shelly EM) to the power supply and network. | Підключення IoT датчика (Shelly EM) до джерела живлення та мережі.
-2. Connecting the Sensor to the Mobile App | Підключення датчика до мобільного додатку
-   - Installing and configuring the mobile app to manage the sensor. | Встановлення та налаштування мобільного додатку для управління датчиком.
-3. Configuring the Sensor to Send Data to AWS IoT Core via MQTT | Налаштування датчика для відправки даних в Amazon IoT Core через MQTT
-   - Setting up MQTT topics and authentication credentials. | Налаштування MQTT топіків та облікових даних для аутентифікації.
-4. Setting Up Data Reception and Transfer to S3 | Налаштування приймання даних та передачі даних в S3
-   - Configuring AWS IoT Core rules to forward received data to Amazon S3. | Конфігурація правил AWS IoT Core для пересилання отриманих даних в Amazon S3.
+#### Stage 0: Sensor Setup and Configuration
+1. **Physical Connection of the Sensor**
+   - Install and safely connect the Shelly EM device to the power supply and network.
+2. **Mobile App Setup**
+   - Configure the mobile app for initial management of the sensor.
+3. **MQTT Configuration**
+   - Set up Shelly EM to transmit telemetry data to AWS IoT Core via MQTT, ensuring proper topic definitions and secure authentication.
+4. **AWS IoT Core Rule Configuration**
+   - Create rules in AWS IoT Core to forward telemetry data to Amazon S3 for storage.
 
-#### Stage 1: Setting Up Data Storage in Amazon S3 | Етап 1: Налаштування зберігання даних в Amazon S3
-1. Creation and configuration of an S3 bucket for data storage. | Створення та конфігурація бакета S3 для зберігання даних.
-   - Setting access policies to secure data. | Встановлення політик доступу для забезпечення безпеки даних.
-   - Configuring data lifecycle management to optimize storage costs. | Налаштування життєвого циклу даних для оптимізації витрат на зберігання.
-2. Configuration of AWS IoT Core to automatically transfer data to S3. | Конфігурація AWS IoT Core для автоматичної передачі даних в S3.
+#### Stage 1: Data Storage in Amazon S3
+1. **S3 Bucket Setup**
+   - Create and configure an S3 bucket with lifecycle management for cost optimization.
+   - Secure the bucket with appropriate IAM policies to control access.
+2. **Automated Data Transfer**
+   - Configure AWS IoT Core rules to ensure seamless data transfer to the S3 bucket.
 
-#### Stage 2: Integration with Google Cloud Platform | Етап 2: Інтеграція з Google Cloud Platform
-1. Setting up access to S3 data from GCP. | Налаштування доступу до даних S3 з GCP.
-   - Using GCP service accounts for secure access to S3. | Використання сервісних облікових записів GCP для безпечного доступу до S3.
-   - Configuring IAM roles for access management. | Конфігурація IAM ролей для управління доступом.
-2. Using Google Cloud Storage Transfer Service for regular data import from S3. | Використання Google Cloud Storage Transfer Service для регулярного імпорту даних з S3.
-   - Automating the data transfer process. | Автоматизація процесу передачі даних.
+#### Stage 2: Integration with Google Cloud Platform
+1. **Accessing AWS S3 Data from GCP**
+   - Use Google Cloud Storage Transfer Service for regular imports from S3 to GCP.
+   - Set up IAM roles and service accounts for secure cross-cloud access.
+2. **Data Synchronization**
+   - Automate the data synchronization process to ensure GCP receives daily aggregated JSONL files from AWS S3.
 
-#### Stage 3: Data Processing and Analysis | Етап 3: Обробка та аналіз даних
-1. Using Google BigQuery for deep analysis of imported data. | Використання Google BigQuery для глибокого аналізу імпортованих даних.
-   - Creating SQL queries to extract insights from data. | Створення SQL запитів для витягу інсайтів з даних.
-2. Using Google Data Studio for visualizing analytical data. | Використання Google Data Studio для візуалізації аналітичних даних.
-   - Developing interactive dashboards for end-users. | Розробка інтерактивних дашбордів для кінцевих користувачів.
+#### Stage 3: Data Processing and Analysis
+1. **Data Aggregation**
+   - Aggregate JSON objects into daily JSONL files using AWS Lambda and State Machines for efficient storage.
+2. **BigQuery Analysis**
+   - Import aggregated data into BigQuery and create SQL queries to analyze power consumption patterns.
+3. **Data Visualization**
+   - Use Looker Studio (Google Data Studio) to build dashboards that provide insights into household power usage and costs.
 
-### Security Measures | Заходи безпеки
-- Encrypting data according to security standards during transmission and storage. | Шифрування даних відповідно до стандартів безпеки під час передачі та зберігання.
-- Regular review and update of access and security policies. | Регулярний перегляд та оновлення політик доступу та безпеки.
+### Adjustments Based on Prior Work
+- Emphasis on **data aggregation at AWS S3 level** to minimize operational costs in GCP.
+- Utilization of **BigQuery external tables** to avoid redundant data replication.
+- Introduction of **integral-based calculations** for energy consumption within non-uniform time intervals.
 
-### Resource Planning | Планування ресурсів
-- Estimating and optimizing costs for storage in S3 and data processing in GCP. | Оцінка та оптимізація витрат на зберігання в S3 та обробку даних в GCP.
-- Monitoring resource usage to avoid unforeseen expenses. | Моніторинг використання ресурсів для уникнення непередбачених витрат.
+### Security Measures
+- Ensure data encryption during storage and transmission.
+- Regularly review and update access controls to align with best practices.
 
-### Backup and Recovery | Резервне копіювання та відновлення
-- Implementing a backup strategy for data stored in S3. | Реалізація стратегії резервного копіювання для даних, збережених в S3.
-- Developing a data recovery plan in case of failures or losses. | Розробка плану відновлення даних у разі збоїв або втрат.
+### Resource Optimization
+- Optimize S3 storage and GCP processing costs based on historical usage patterns.
+- Transition unused raw data to AWS Glacier for cost-effective archiving.
 
-### Monitoring and Logging | Моніторинг та логування
-- Setting up monitoring to track the status of AWS and GCP components. | Налаштування моніторингу для відстеження стану компонентів AWS та GCP.
-- Logging important events for analysis and problem detection. | Логування важливих подій для аналізу та виявлення проблем.
+### Backup and Recovery
+- Implement robust backup policies for both AWS and GCP to ensure data reliability.
+- Test recovery plans periodically to confirm data availability during failures.
 
-### Versioning and Documentation | Версіонування та документація
-- Maintaining version control of configurations and code. | Ведення контролю версій конфігурацій та коду.
-- Preparing detailed project documentation to ensure transparency and support. | Підготовка детальної документації проекту для забезпечення прозорості та підтримки.
+### Monitoring and Logging
+- Set up CloudWatch (AWS) and Google Cloud Monitoring to track system performance.
+- Log critical events in both clouds to enable troubleshooting and usage analysis.
 
-### Final Measures | Заключні заходи
-- Conducting testing to verify integration and functionality. | Проведення тестування для перевірки інтеграції та функціональності.
-- Deploying the project in a production environment. | Розгортання проекту в продакшн середовище.
-- Organizing training for users and providing technical support. | Організація тренінгів для користувачів та забезпечення технічної підтримки.
+### Versioning and Documentation
+- Maintain detailed version control for infrastructure configurations and scripts.
+- Document all configurations, workflows, and processes to ensure project scalability and maintenance.
+
+### Future Plans
+- Explore integration with solar energy generation data (e.g., Photovoltaic Geographical Information System).
+- Investigate potential savings by shifting energy consumption patterns based on multi-zone tariff models.
+- Develop more advanced analysis using PySpark or machine learning for predictive energy management.
+
+### Final Measures
+- Conduct thorough testing of the entire pipeline from sensor setup to data analysis.
+- Deploy the system into a production environment with adequate training and support for users.
+- Monitor and refine the system as more data is collected and analyzed.
+
+### Key Takeaway
+The updated plan leverages lessons learned from previous implementations to improve scalability, cost efficiency, and analytic capabilities, ensuring a robust and user-friendly IoT solution.
